@@ -295,6 +295,117 @@ export default function ApplyPage() {
               </div>
             </div>
 
+
+                        {/* Education and programme */}
+            <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
+              <div className="border-b border-black/10 pb-5">
+                <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
+                  Section 3
+                </p>
+
+                <h2 className="mt-2 text-2xl font-bold">
+                  Education and Programme
+                </h2>
+
+                <p className="mt-2 text-sm leading-6 text-[var(--prospherum-muted)]">
+                  Provide information about your educational background and
+                  the opportunity you are applying for.
+                </p>
+              </div>
+
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                {/* Highest qualification */}
+                <div>
+                  <label
+                    htmlFor="highest_qualification"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    Highest qualification
+                  </label>
+
+                  <input
+                    id="highest_qualification"
+                    name="highest_qualification"
+                    type="text"
+                    placeholder="e.g. Grade 12, Diploma, Degree"
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  />
+                </div>
+
+                {/* Field of study */}
+                <div>
+                  <label
+                    htmlFor="field_of_study"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    Field of study
+                  </label>
+
+                  <input
+                    id="field_of_study"
+                    name="field_of_study"
+                    type="text"
+                    placeholder="e.g. Information Technology"
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  />
+                </div>
+
+                {/* Institution */}
+                <div>
+                  <label
+                    htmlFor="institution"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    Institution
+                  </label>
+
+                  <input
+                    id="institution"
+                    name="institution"
+                    type="text"
+                    placeholder="Name of school, college or institution"
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  />
+                </div>
+
+                {/* Programme */}
+                <div>
+                  <label
+                    htmlFor="programme_applied_for"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    Programme applied for
+                  </label>
+
+                  <input
+                    id="programme_applied_for"
+                    name="programme_applied_for"
+                    type="text"
+                    placeholder="Enter the programme or opportunity"
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  />
+                </div>
+
+                {/* Skills and computer literacy */}
+                <div className="sm:col-span-2">
+                  <label
+                    htmlFor="skills_computer_literacy"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    Skills and computer literacy
+                  </label>
+
+                  <textarea
+                    id="skills_computer_literacy"
+                    name="skills_computer_literacy"
+                    rows={4}
+                    placeholder="Describe your relevant skills, computer knowledge, software experience or other abilities."
+                    className="w-full resize-none rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Form actions */}
             <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
               <Link
