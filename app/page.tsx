@@ -33,31 +33,36 @@ export default function Home() {
     <main className="min-h-screen bg-white text-[var(--prospherum-text)]">
       {/* Header */}
       <header className="border-b border-black/10 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-8 sm:py-4">
+          {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-3"
+            className="flex min-w-0 shrink items-center gap-3"
             aria-label="Prospherum home"
           >
-<div className="relative h-12 w-48">
-  <Image
-    src="/branding/prospherum-logo.png"
-    alt="Prospherum Skills Academy"
-    fill
-    priority
-    className="object-contain object-left"
-  />
-</div>
-            <div>
+            <div className="relative h-10 w-36 shrink-0 sm:h-12 sm:w-48">
+              <Image
+                src="/branding/prospherum-logo.png"
+                alt="Prospherum Skills Academy"
+                fill
+                priority
+                className="object-contain object-left"
+              />
+            </div>
+
+            {/* Desktop brand text */}
+            <div className="hidden sm:block">
               <div className="text-lg font-bold tracking-tight">
                 Prospherum
               </div>
+
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--prospherum-muted)]">
                 Skills Academy
               </div>
             </div>
           </Link>
 
+          {/* Desktop Navigation */}
           <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
             <Link
               href="#about"
@@ -65,18 +70,21 @@ export default function Home() {
             >
               About
             </Link>
+
             <Link
               href="#how-it-works"
               className="transition-colors hover:text-[var(--prospherum-green)]"
             >
               How It Works
             </Link>
+
             <Link
               href="#contact"
               className="transition-colors hover:text-[var(--prospherum-green)]"
             >
               Contact
             </Link>
+
             <Link
               href="/staff/login"
               className="border border-[var(--prospherum-black)] px-5 py-2.5 transition-colors hover:bg-[var(--prospherum-black)] hover:text-white"
@@ -85,12 +93,22 @@ export default function Home() {
             </Link>
           </nav>
 
-          <Link
-            href="/apply"
-            className="bg-[var(--prospherum-green)] px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-[var(--prospherum-green-dark)] md:hidden"
-          >
-            Apply
-          </Link>
+          {/* Mobile Navigation */}
+          <div className="flex shrink-0 items-center gap-1.5 md:hidden">
+            <Link
+              href="/staff/login"
+              className="whitespace-nowrap border border-black/15 px-2.5 py-2 text-[11px] font-semibold text-[var(--prospherum-black)] transition-colors hover:border-[var(--prospherum-green)] hover:bg-[var(--prospherum-green-light)] hover:text-[var(--prospherum-green)]"
+            >
+              Staff Sign In
+            </Link>
+
+            <Link
+              href="/apply"
+              className="whitespace-nowrap bg-[var(--prospherum-green)] px-3 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-[var(--prospherum-green-dark)]"
+            >
+              Apply
+            </Link>
+          </div>
         </div>
       </header>
 
@@ -171,6 +189,7 @@ export default function Home() {
               <p className="text-xl font-semibold leading-8 text-[var(--prospherum-text)]">
                 “Your success is our success.”
               </p>
+
               <p className="mt-4 text-sm leading-6 text-[var(--prospherum-muted)]">
                 Prospherum supports learners with more than training alone,
                 including selection, learner support and tools that can help
@@ -182,10 +201,7 @@ export default function Home() {
       </section>
 
       {/* How it works */}
-      <section
-        id="how-it-works"
-        className="bg-[var(--prospherum-grey)]"
-      >
+      <section id="how-it-works" className="bg-[var(--prospherum-grey)]">
         <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
           <div className="max-w-2xl">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green)]">
@@ -259,6 +275,7 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 sm:px-8 md:flex-row md:items-center md:justify-between">
           <div>
             <div className="font-bold">Prospherum</div>
+
             <div className="mt-1 text-sm text-white/60">
               Skills Development Fund
             </div>
