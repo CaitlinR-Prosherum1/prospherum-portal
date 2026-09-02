@@ -3,21 +3,316 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
+const MAX_FILE_SIZE = 10 * 1024 * 1024;
+
+const ALLOWED_TYPES = [
+  "application/pdf",
+  "image/jpeg",
+  "image/png",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
+type DocumentField = {
+  name: string;
+  label: string;
+  description: string;
+  documentType: string;
+  required?: boolean;
+};
+
+const DOCUMENT_FIELDS: DocumentField[] = [
+  {
+    name: "cv",
+    label: "CV / Resume",
+    description: "Upload your most recent CV or resume.",
+    documentType: "CV",
+    required: true,
+  },
+  {
+    name: "id_document",
+    label: "South African ID",
+    description: "Upload a clear copy of your South African ID.",
+    documentType: "ID",
+    required: true,
+  },
+  {
+    name: "qualification",
+    label: "Highest Qualification",
+    description: "Upload your highest qualification certificate.",
+    documentType: "QUALIFICATION",
+    required: true,
+  },
+  {
+    name: "proof_of_address",
+    label: "Proof of Address",
+    description: "Optional supporting document.",
+    documentType: "PROOF_OF_ADDRESS",
+  },
+  {
+    name: "other_document",
+    label: "Other Supporting Document",
+    description: "Optional additional supporting document.",
+    documentType: "OTHER",
+  },
+];
+
+function validateFiles(form: HTMLFormElement) {
+  for (const field of DOCUMENT_FIELDS) {
+    const input = form.elements.namedItem(field.name) as HTMLInputElement | null;
+    const file = input?.files?.[0];
+
+    if (field.required && !file) {
+      throw new Error(`${field.label} is required.`);
+    }
+
+    if (!file) continue;
+
+    if (file.size === 0) {
+      throw new Error(`${field.label} is empty.`);
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      throw new Error(`${field.label} must not exceed 10 MB.`);
+    }
+
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      throw new Error(
+        `${field.label} must be a PDF, JPG, PNG, DOC or DOCX file.`,
+      );
+    }
+  }
+}
+
+async function uploadDocument(
+  applicationId: string,
+  file: File,
+  documentType: string,
+) {
+  const formData = new FormData();
+
+  formData.append("document_type", documentType);
+  formData.append("file", file);
+
+  const response = await fetch(
+    `/api/applications/${applicationId}/documents`,
+    {
+      method: "POST",
+      body: formData,
+    },
+  );
+
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      result?.error || `Unable to upload ${documentType} document.`,
+    );
+  }
+}
+
 export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setSubmitting(true);
 
-    // Submission logic will be added after the form structure
-    // has been tested.
-    setSubmitting(false);
+    if (submitting) return;
+
+    const form = event.currentTarget;
+
+    setErrorMessage("");
+
+    try {
+      validateFiles(form);
+
+      setSubmitting(true);
+
+      const formData = new FormData(form);
+
+      const payload = {
+        first_name: formData.get("first_name"),
+        last_name: formData.get("last_name"),
+        email: formData.get("email"),
+        phone: formData.get("phone"),
+        id_number: formData.get("id_number"),
+        date_of_birth: formData.get("date_of_birth"),
+        address: formData.get("address"),
+        city: formData.get("city"),
+        province: formData.get("province"),
+        highest_qualification: formData.get("highest_qualification"),
+        field_of_study: formData.get("field_of_study"),
+        institution: formData.get("institution"),
+        programme_applied_for: formData.get("programme_applied_for"),
+        skills_computer_literacy: formData.get("skills_computer_literacy"),
+      };
+
+      const applicationResponse = await fetch("/api/applications", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const applicationResult = await applicationResponse.json();
+
+      if (!applicationResponse.ok) {
+        throw new Error(
+          applicationResult?.error ||
+            "Unable to create your application.",
+        );
+      }
+
+      const applicationId = applicationResult.application_id;
+
+      if (!applicationId) {
+        throw new Error(
+          "Application was created but no application ID was returned.",
+        );
+      }
+
+      /*
+       * Upload all selected supporting documents.
+       */
+      for (const field of DOCUMENT_FIELDS) {
+        const input = form.elements.namedItem(
+          field.name,
+        ) as HTMLInputElement | null;
+
+        const file = input?.files?.[0];
+
+        if (!file) continue;
+
+        await uploadDocument(
+          applicationId,
+          file,
+          field.documentType,
+        );
+      }
+
+      setSuccess(applicationResult.reference_number);
+
+      /*
+       * Scroll to the success message after React renders it.
+       */
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 50);
+    } catch (error) {
+      console.error("Application submission failed:", error);
+
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to submit your application. Please try again.",
+      );
+
+      /*
+       * Scroll to the error message only after it has rendered.
+       */
+      setTimeout(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth",
+        });
+      }, 50);
+    } finally {
+      setSubmitting(false);
+    }
   }
 
+  /*
+   * SUCCESS SCREEN
+   */
+  if (success) {
+    return (
+      <main className="min-h-screen bg-[var(--prospherum-grey)] text-[var(--prospherum-text)]">
+        <header className="border-b border-black/10 bg-white">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
+            <Link href="/" className="flex items-center gap-3">
+              <div className="relative h-12 w-48">
+                <img
+                  src="/branding/prospherum-logo.png"
+                  alt="Prospherum Skills Academy"
+                  className="h-full w-full object-contain object-left"
+                />
+              </div>
+
+              <div className="hidden sm:block">
+                <div className="text-lg font-bold tracking-tight">
+                  Prospherum
+                </div>
+
+                <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--prospherum-muted)]">
+                  Skills Academy
+                </div>
+              </div>
+            </Link>
+          </div>
+        </header>
+
+        <section className="px-5 py-16 sm:px-8 sm:py-24">
+          <div className="mx-auto max-w-2xl">
+            <div className="bg-white p-8 text-center shadow-sm ring-1 ring-black/5 sm:p-12">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--prospherum-green)] text-3xl font-bold text-white">
+                ✓
+              </div>
+
+              <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green)]">
+                Application Submitted
+              </p>
+
+              <h1 className="mt-3 text-3xl font-bold tracking-tight">
+                Thank you for applying.
+              </h1>
+
+              <p className="mt-4 leading-7 text-[var(--prospherum-muted)]">
+                Your application and supporting documents have been
+                successfully received by Prospherum Skills Academy.
+              </p>
+
+              <div className="mt-8 rounded-xl bg-[var(--prospherum-grey)] p-6">
+                <p className="text-sm font-semibold text-[var(--prospherum-muted)]">
+                  Your application reference number
+                </p>
+
+                <p className="mt-2 text-2xl font-bold tracking-wider">
+                  {success}
+                </p>
+
+                <p className="mt-3 text-xs text-[var(--prospherum-muted)]">
+                  Please keep this reference number for future enquiries.
+                </p>
+              </div>
+
+              <Link
+                href="/"
+                className="mt-8 inline-flex items-center justify-center rounded-lg bg-[var(--prospherum-green)] px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
+              >
+                Return to Home
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        <footer className="border-t border-black/10 bg-white px-5 py-8 text-center text-xs text-[var(--prospherum-muted)]">
+          © 2026 Prospherum. All rights reserved.
+        </footer>
+      </main>
+    );
+  }
+
+  /*
+   * APPLICATION FORM
+   */
   return (
     <main className="min-h-screen bg-[var(--prospherum-grey)] text-[var(--prospherum-text)]">
-      {/* Header */}
       <header className="border-b border-black/10 bg-white">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
           <Link href="/" className="flex items-center gap-3">
@@ -33,6 +328,7 @@ export default function ApplyPage() {
               <div className="text-lg font-bold tracking-tight">
                 Prospherum
               </div>
+
               <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--prospherum-muted)]">
                 Skills Academy
               </div>
@@ -48,7 +344,6 @@ export default function ApplyPage() {
         </div>
       </header>
 
-      {/* Page heading */}
       <section className="bg-[var(--prospherum-black)] text-white">
         <div className="mx-auto max-w-4xl px-5 py-14 sm:px-8 sm:py-16">
           <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green-light)]">
@@ -66,14 +361,27 @@ export default function ApplyPage() {
         </div>
       </section>
 
-      {/* Application form */}
       <section className="px-5 py-10 sm:px-8 sm:py-14">
         <div className="mx-auto max-w-4xl">
+          {errorMessage && (
+            <div
+              id="application-error"
+              role="alert"
+              className="mb-8 border border-red-200 bg-red-50 p-5 text-sm text-red-800"
+            >
+              <p className="font-bold">
+                We could not submit your application.
+              </p>
+
+              <p className="mt-1">{errorMessage}</p>
+            </div>
+          )}
+
           <form
             onSubmit={handleSubmit}
             className="space-y-8"
           >
-            {/* Applicant information */}
+            {/* SECTION 1 */}
             <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
               <div className="border-b border-black/10 pb-5">
                 <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
@@ -91,7 +399,6 @@ export default function ApplyPage() {
               </div>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                {/* First name */}
                 <div>
                   <label
                     htmlFor="first_name"
@@ -110,7 +417,6 @@ export default function ApplyPage() {
                   />
                 </div>
 
-                {/* Last name */}
                 <div>
                   <label
                     htmlFor="last_name"
@@ -129,7 +435,6 @@ export default function ApplyPage() {
                   />
                 </div>
 
-                {/* Email */}
                 <div>
                   <label
                     htmlFor="email"
@@ -149,7 +454,6 @@ export default function ApplyPage() {
                   />
                 </div>
 
-                {/* Phone */}
                 <div>
                   <label
                     htmlFor="phone"
@@ -169,7 +473,6 @@ export default function ApplyPage() {
                   />
                 </div>
 
-                {/* ID number */}
                 <div>
                   <label
                     htmlFor="id_number"
@@ -185,7 +488,6 @@ export default function ApplyPage() {
                     inputMode="numeric"
                     maxLength={13}
                     autoComplete="off"
-                    placeholder="13-digit ID number"
                     className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
 
@@ -195,7 +497,6 @@ export default function ApplyPage() {
                   </p>
                 </div>
 
-                {/* Date of birth */}
                 <div>
                   <label
                     htmlFor="date_of_birth"
@@ -214,7 +515,7 @@ export default function ApplyPage() {
               </div>
             </div>
 
-            {/* Address */}
+            {/* SECTION 2 */}
             <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
               <div className="border-b border-black/10 pb-5">
                 <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
@@ -226,8 +527,8 @@ export default function ApplyPage() {
                 </h2>
               </div>
 
-              <div className="mt-6 space-y-5">
-                <div>
+              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+                <div className="sm:col-span-2">
                   <label
                     htmlFor="address"
                     className="mb-2 block text-sm font-semibold"
@@ -239,64 +540,56 @@ export default function ApplyPage() {
                     id="address"
                     name="address"
                     rows={3}
-                    autoComplete="street-address"
-                    placeholder="Street address"
-                    className="w-full resize-none rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
                 </div>
 
-                <div className="grid gap-5 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="city"
-                      className="mb-2 block text-sm font-semibold"
-                    >
-                      City / Town
-                    </label>
+                <div>
+                  <label
+                    htmlFor="city"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    City / Town
+                  </label>
 
-                    <input
-                      id="city"
-                      name="city"
-                      type="text"
-                      autoComplete="address-level2"
-                      className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                    />
-                  </div>
+                  <input
+                    id="city"
+                    name="city"
+                    type="text"
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  />
+                </div>
 
-                  <div>
-                    <label
-                      htmlFor="province"
-                      className="mb-2 block text-sm font-semibold"
-                    >
-                      Province
-                    </label>
+                <div>
+                  <label
+                    htmlFor="province"
+                    className="mb-2 block text-sm font-semibold"
+                  >
+                    Province
+                  </label>
 
-                    <select
-                      id="province"
-                      name="province"
-                      defaultValue=""
-                      className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                    >
-                      <option value="" disabled>
-                        Select province
-                      </option>
-                      <option value="Eastern Cape">Eastern Cape</option>
-                      <option value="Free State">Free State</option>
-                      <option value="Gauteng">Gauteng</option>
-                      <option value="KwaZulu-Natal">KwaZulu-Natal</option>
-                      <option value="Limpopo">Limpopo</option>
-                      <option value="Mpumalanga">Mpumalanga</option>
-                      <option value="Northern Cape">Northern Cape</option>
-                      <option value="North West">North West</option>
-                      <option value="Western Cape">Western Cape</option>
-                    </select>
-                  </div>
+                  <select
+                    id="province"
+                    name="province"
+                    defaultValue=""
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                  >
+                    <option value="">Select province</option>
+                    <option>Eastern Cape</option>
+                    <option>Free State</option>
+                    <option>Gauteng</option>
+                    <option>KwaZulu-Natal</option>
+                    <option>Limpopo</option>
+                    <option>Mpumalanga</option>
+                    <option>Northern Cape</option>
+                    <option>North West</option>
+                    <option>Western Cape</option>
+                  </select>
                 </div>
               </div>
             </div>
 
-
-                        {/* Education and programme */}
+            {/* SECTION 3 */}
             <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
               <div className="border-b border-black/10 pb-5">
                 <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
@@ -314,7 +607,6 @@ export default function ApplyPage() {
               </div>
 
               <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                {/* Highest qualification */}
                 <div>
                   <label
                     htmlFor="highest_qualification"
@@ -327,12 +619,10 @@ export default function ApplyPage() {
                     id="highest_qualification"
                     name="highest_qualification"
                     type="text"
-                    placeholder="e.g. Grade 12, Diploma, Degree"
                     className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
                 </div>
 
-                {/* Field of study */}
                 <div>
                   <label
                     htmlFor="field_of_study"
@@ -345,12 +635,10 @@ export default function ApplyPage() {
                     id="field_of_study"
                     name="field_of_study"
                     type="text"
-                    placeholder="e.g. Information Technology"
                     className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
                 </div>
 
-                {/* Institution */}
                 <div>
                   <label
                     htmlFor="institution"
@@ -363,12 +651,10 @@ export default function ApplyPage() {
                     id="institution"
                     name="institution"
                     type="text"
-                    placeholder="Name of school, college or institution"
                     className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
                 </div>
 
-                {/* Programme */}
                 <div>
                   <label
                     htmlFor="programme_applied_for"
@@ -381,12 +667,10 @@ export default function ApplyPage() {
                     id="programme_applied_for"
                     name="programme_applied_for"
                     type="text"
-                    placeholder="Enter the programme or opportunity"
                     className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
                 </div>
 
-                {/* Skills and computer literacy */}
                 <div className="sm:col-span-2">
                   <label
                     htmlFor="skills_computer_literacy"
@@ -399,14 +683,71 @@ export default function ApplyPage() {
                     id="skills_computer_literacy"
                     name="skills_computer_literacy"
                     rows={4}
-                    placeholder="Describe your relevant skills, computer knowledge, software experience or other abilities."
-                    className="w-full resize-none rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                    placeholder="List relevant computer skills, software, systems or other abilities."
+                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Form actions */}
+            {/* SECTION 4 */}
+            <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
+              <div className="border-b border-black/10 pb-5">
+                <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
+                  Section 4
+                </p>
+
+                <h2 className="mt-2 text-2xl font-bold">
+                  Supporting Documents
+                </h2>
+
+                <p className="mt-2 text-sm leading-6 text-[var(--prospherum-muted)]">
+                  Upload the documents required to support your application.
+                  Each file must be no larger than 10 MB.
+                </p>
+              </div>
+
+              <div className="mt-6 space-y-5">
+                {DOCUMENT_FIELDS.map((field) => (
+                  <div
+                    key={field.name}
+                    className="rounded-xl border border-black/10 bg-[var(--prospherum-grey)] p-5"
+                  >
+                    <label
+                      htmlFor={field.name}
+                      className="block text-sm font-bold"
+                    >
+                      {field.label}{" "}
+                      {field.required && (
+                        <span className="text-red-600">*</span>
+                      )}
+                    </label>
+
+                    <p className="mt-1 text-xs leading-5 text-[var(--prospherum-muted)]">
+                      {field.description}
+                    </p>
+
+                    <input
+                      id={field.name}
+                      name={field.name}
+                      type="file"
+                      required={field.required}
+                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                      className="mt-4 block w-full cursor-pointer rounded-lg border border-black/15 bg-white px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[var(--prospherum-green)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:opacity-90"
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-6 rounded-lg border border-black/10 bg-white p-4">
+                <p className="text-xs leading-5 text-[var(--prospherum-muted)]">
+                  <strong>Accepted formats:</strong> PDF, JPG, PNG, DOC and
+                  DOCX. Maximum file size is 10 MB per document.
+                </p>
+              </div>
+            </div>
+
+            {/* FORM ACTIONS */}
             <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href="/"
@@ -418,18 +759,19 @@ export default function ApplyPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="bg-[var(--prospherum-green)] px-8 py-4 font-bold text-white transition-colors hover:bg-[var(--prospherum-green-dark)] disabled:cursor-not-allowed disabled:opacity-50"
+                className="rounded-lg bg-[var(--prospherum-green)] px-7 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {submitting ? "Saving..." : "Continue Application"}
+                {submitting
+                  ? "Submitting Application..."
+                  : "Submit Application"}
               </button>
             </div>
           </form>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[var(--prospherum-black)] px-5 py-8 text-center text-sm text-white/60 sm:px-8">
-        © {new Date().getFullYear()} Prospherum. All rights reserved.
+      <footer className="border-t border-black/10 bg-white px-5 py-8 text-center text-xs text-[var(--prospherum-muted)]">
+        © 2026 Prospherum. All rights reserved.
       </footer>
     </main>
   );

@@ -48,3 +48,243 @@ button,
 a {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* =========================================================
+   STAFF PORTAL — LIGHT THEME
+   Scoped exclusively to data-staff-theme="light".
+   Existing dark theme remains untouched.
+   ========================================================= */
+
+html[data-staff-theme="light"] {
+  background: #f5f7f6;
+  color: #18201c;
+}
+
+html[data-staff-theme="light"] body {
+  background: #f5f7f6;
+  color: #18201c;
+}
+
+/* Main backgrounds */
+html[data-staff-theme="light"] .bg-black {
+  background-color: #f5f7f6 !important;
+}
+
+html[data-staff-theme="light"] .bg-zinc-950 {
+  background-color: #ffffff !important;
+}
+
+/* White text → readable dark text */
+html[data-staff-theme="light"] .text-white {
+  color: #18201c !important;
+}
+
+html[data-staff-theme="light"] .text-gray-200 {
+  color: #303b35 !important;
+}
+
+html[data-staff-theme="light"] .text-gray-300 {
+  color: #3f4b45 !important;
+}
+
+html[data-staff-theme="light"] .text-gray-400 {
+  color: #59665f !important;
+}
+
+html[data-staff-theme="light"] .text-gray-500 {
+  color: #68756e !important;
+}
+
+html[data-staff-theme="light"] .text-gray-600 {
+  color: #7a867f !important;
+}
+
+html[data-staff-theme="light"] .text-gray-700 {
+  color: #536059 !important;
+}
+
+/* Borders */
+html[data-staff-theme="light"] .border-white\/5 {
+  border-color: #e9eeeb !important;
+}
+
+html[data-staff-theme="light"] .border-white\/10 {
+  border-color: #dce4df !important;
+}
+
+html[data-staff-theme="light"] .border-white\/20 {
+  border-color: #cbd6d0 !important;
+}
+
+/* Translucent white surfaces */
+html[data-staff-theme="light"] .bg-white\/5 {
+  background-color: #eef3f0 !important;
+}
+
+html[data-staff-theme="light"] .bg-white\/\[0\.015\] {
+  background-color: #f9faf9 !important;
+}
+
+html[data-staff-theme="light"] .bg-white\/\[0\.02\] {
+  background-color: #f8faf9 !important;
+}
+
+html[data-staff-theme="light"] .bg-white\/\[0\.03\] {
+  background-color: #ffffff !important;
+}
+
+html[data-staff-theme="light"] .bg-white\/\[0\.04\] {
+  background-color: #ffffff !important;
+}
+
+/* Inputs and controls */
+html[data-staff-theme="light"] input.bg-black,
+html[data-staff-theme="light"] select.bg-black,
+html[data-staff-theme="light"] textarea.bg-black {
+  background-color: #ffffff !important;
+  color: #18201c !important;
+  border-color: #d5dfd9 !important;
+}
+
+html[data-staff-theme="light"] input::placeholder,
+html[data-staff-theme="light"] textarea::placeholder {
+  color: #89958e !important;
+}
+
+/* Green brand colours stay green */
+html[data-staff-theme="light"] .text-green-400 {
+  color: #187044 !important;
+}
+
+html[data-staff-theme="light"] .text-green-300 {
+  color: #1b6f45 !important;
+}
+
+html[data-staff-theme="light"] .bg-green-600 {
+  background-color: #1f7a4d !important;
+}
+
+html[data-staff-theme="light"] .hover\:bg-green-500:hover {
+  background-color: #258d59 !important;
+}
+
+/* Green tinted surfaces */
+html[data-staff-theme="light"] .bg-green-500\/5 {
+  background-color: #f0f9f3 !important;
+}
+
+html[data-staff-theme="light"] .bg-green-500\/10 {
+  background-color: #eaf6ef !important;
+}
+
+html[data-staff-theme="light"] .bg-green-500\/20 {
+  background-color: #d9f0e2 !important;
+}
+
+html[data-staff-theme="light"] .border-green-500\/20 {
+  border-color: #c8e4d2 !important;
+}
+
+html[data-staff-theme="light"] .border-green-500\/30 {
+  border-color: #b8dcc5 !important;
+}
+
+/* Red alerts / rejection areas */
+html[data-staff-theme="light"] .bg-red-500\/5 {
+  background-color: #fff7f7 !important;
+}
+
+html[data-staff-theme="light"] .bg-red-500\/10 {
+  background-color: #fff0f0 !important;
+}
+
+html[data-staff-theme="light"] .text-red-300 {
+  color: #a63d3d !important;
+}
+
+html[data-staff-theme="light"] .text-red-400 {
+  color: #b33d3d !important;
+}
+
+html[data-staff-theme="light"] .border-red-500\/10 {
+  border-color: #f3d6d6 !important;
+}
+
+html[data-staff-theme="light"] .border-red-500\/20 {
+  border-color: #edcaca !important;
+}
+
+html[data-staff-theme="light"] .border-red-500\/30 {
+  border-color: #e8bcbc !important;
+}
+
+/* Other status colours */
+html[data-staff-theme="light"] .text-blue-300 {
+  color: #2563a8 !important;
+}
+
+html[data-staff-theme="light"] .text-cyan-300 {
+  color: #14748a !important;
+}
+
+html[data-staff-theme="light"] .text-purple-300 {
+  color: #7045a0 !important;
+}
+
+html[data-staff-theme="light"] .text-yellow-300 {
+  color: #8a6412 !important;
+}
+
+html[data-staff-theme="light"] .text-gray-400 {
+  color: #68756e !important;
+}
+
+/* Status backgrounds */
+html[data-staff-theme="light"] .bg-blue-500\/10 {
+  background-color: #eef6ff !important;
+}
+
+html[data-staff-theme="light"] .bg-cyan-500\/10 {
+  background-color: #edfafd !important;
+}
+
+html[data-staff-theme="light"] .bg-purple-500\/10 {
+  background-color: #f5f0fa !important;
+}
+
+html[data-staff-theme="light"] .bg-yellow-500\/10 {
+  background-color: #fff9e8 !important;
+}
+
+html[data-staff-theme="light"] .bg-gray-500\/10 {
+  background-color: #f1f3f2 !important;
+}
+
+/* Modal */
+html[data-staff-theme="light"] .bg-black\/80 {
+  background-color: rgb(20 25 22 / 70%) !important;
+}
+
+html[data-staff-theme="light"] .bg-\[\#0b0b0b\] {
+  background-color: #ffffff !important;
+}
+
+/* Hover surfaces */
+html[data-staff-theme="light"] .hover\:bg-white\/5:hover {
+  background-color: #eef3f0 !important;
+}
+
+html[data-staff-theme="light"] .hover\:bg-white\/10:hover {
+  background-color: #e8eeeb !important;
+}
+
+/* Shadows remain subtle in light mode */
+html[data-staff-theme="light"] .shadow-2xl,
+html[data-staff-theme="light"] .shadow-xl {
+  box-shadow: 0 10px 30px rgb(20 40 30 / 8%) !important;
+}
+
+/* Dark theme specific translucent header backgrounds */
+html[data-staff-theme="light"] .bg-black\/95 {
+  background-color: rgb(255 255 255 / 95%) !important;
+}
