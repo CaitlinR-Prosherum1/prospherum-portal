@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
@@ -11,6 +12,22 @@ const ALLOWED_TYPES = [
   "image/png",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
+const HERO_IMAGES = [
+  "/branding/pic1.jpg",
+  "/branding/pic2.png",
+  "/branding/pic3.jpg",
+  "/branding/pic4.jpg",
+  "/branding/pic5.jpg",
+  "/branding/pic6.png",
+  "/branding/pic7.jpg",
+  "/branding/pic8.jpg",
+  "/branding/pic9.png",
+  "/branding/pic10.png",
+  "/branding/pic11.jpg",
+  "/branding/pic12.png",
+  "/branding/pic13.png",
 ];
 
 type DocumentField = {
@@ -59,7 +76,10 @@ const DOCUMENT_FIELDS: DocumentField[] = [
 
 function validateFiles(form: HTMLFormElement) {
   for (const field of DOCUMENT_FIELDS) {
-    const input = form.elements.namedItem(field.name) as HTMLInputElement | null;
+    const input = form.elements.namedItem(
+      field.name,
+    ) as HTMLInputElement | null;
+
     const file = input?.files?.[0];
 
     if (field.required && !file) {
@@ -111,10 +131,37 @@ async function uploadDocument(
   }
 }
 
+function PageAtmosphere() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 overflow-hidden"
+    >
+      <div className="absolute -right-44 top-1/4 h-[420px] w-[420px] rounded-full bg-emerald-400/[0.045] blur-[140px]" />
+      <div className="absolute -left-44 bottom-1/4 h-[360px] w-[360px] rounded-full bg-emerald-300/[0.035] blur-[130px]" />
+    </div>
+  );
+}
+
+const inputClass =
+  "mt-2 block min-h-[50px] w-full appearance-none rounded-xl border border-[#b8c4bd] bg-[#eef2f0] px-4 py-3 text-sm text-[#17221c] shadow-sm outline-none transition-all duration-150 placeholder:text-[#7a8780] hover:border-[#9eaba3] hover:bg-[#f3f6f4] focus:border-[#18a85b] focus:bg-white focus:ring-4 focus:ring-[#18a85b]/10";
+
+const textareaClass =
+  "mt-2 block w-full rounded-xl border border-[#b8c4bd] bg-[#eef2f0] px-4 py-3 text-sm text-[#17221c] shadow-sm outline-none transition-all duration-150 placeholder:text-[#7a8780] hover:border-[#9eaba3] hover:bg-[#f3f6f4] focus:border-[#18a85b] focus:bg-white focus:ring-4 focus:ring-[#18a85b]/10";
+
 export default function ApplyPage() {
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [errorMessage, setErrorMessage] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveImage((current) => (current + 1) % HERO_IMAGES.length);
+    }, 5500);
+
+    return () => window.clearInterval(interval);
+  }, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -174,9 +221,6 @@ export default function ApplyPage() {
         );
       }
 
-      /*
-       * Upload all selected supporting documents.
-       */
       for (const field of DOCUMENT_FIELDS) {
         const input = form.elements.namedItem(
           field.name,
@@ -195,9 +239,6 @@ export default function ApplyPage() {
 
       setSuccess(applicationResult.reference_number);
 
-      /*
-       * Scroll to the success message after React renders it.
-       */
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -213,9 +254,6 @@ export default function ApplyPage() {
           : "Unable to submit your application. Please try again.",
       );
 
-      /*
-       * Scroll to the error message only after it has rendered.
-       */
       setTimeout(() => {
         window.scrollTo({
           top: 0,
@@ -227,147 +265,190 @@ export default function ApplyPage() {
     }
   }
 
-  /*
-   * SUCCESS SCREEN
-   */
   if (success) {
     return (
-      <main className="min-h-screen bg-[var(--prospherum-grey)] text-[var(--prospherum-text)]">
-        <header className="border-b border-black/10 bg-white">
-          <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-            <Link href="/" className="flex items-center gap-3">
-              <div className="relative h-12 w-48">
-                <img
-                  src="/branding/prospherum-logo.png"
-                  alt="Prospherum Skills Academy"
-                  className="h-full w-full object-contain object-left"
-                />
-              </div>
+      <main className="relative min-h-screen overflow-hidden bg-[#f4f7f5] text-[var(--prospherum-text)]">
+        <PageAtmosphere />
 
-              <div className="hidden sm:block">
-                <div className="text-lg font-bold tracking-tight">
-                  Prospherum
-                </div>
+        <header className="relative z-20 border-b border-black/[0.08] bg-white/95 backdrop-blur">
+          <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-3 sm:px-8 sm:py-4">
+            <Link
+              href="/"
+              aria-label="Prospherum home"
+              className="relative flex h-9 w-36 items-center sm:h-11 sm:w-48"
+            >
+              <Image
+                src="/branding/prospherum_logo_trans3.png"
+                alt="Prospherum Skills Academy"
+                fill
+                priority
+                className="object-contain object-left"
+              />
+            </Link>
 
-                <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--prospherum-muted)]">
-                  Skills Academy
-                </div>
-              </div>
+            <Link
+              href="/"
+              className="text-xs font-semibold text-[var(--prospherum-muted)] transition hover:text-[var(--prospherum-green)] sm:text-sm"
+            >
+              ← Back to Home
             </Link>
           </div>
         </header>
 
-        <section className="px-5 py-16 sm:px-8 sm:py-24">
+        <section className="relative z-10 px-5 py-12 sm:px-8 sm:py-20">
           <div className="mx-auto max-w-2xl">
-            <div className="bg-white p-8 text-center shadow-sm ring-1 ring-black/5 sm:p-12">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[var(--prospherum-green)] text-3xl font-bold text-white">
+            <div className="rounded-3xl border border-black/[0.06] bg-white p-7 shadow-xl shadow-black/[0.06] sm:p-12">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500 text-3xl font-bold text-white">
                 ✓
               </div>
 
-              <p className="mt-6 text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green)]">
-                Application Submitted
-              </p>
+              <div className="mt-6 text-center">
+                <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[var(--prospherum-green)]">
+                  Application Submitted
+                </p>
 
-              <h1 className="mt-3 text-3xl font-bold tracking-tight">
-                Thank you for applying.
-              </h1>
+                <h1 className="mt-3 text-2xl font-bold tracking-tight sm:text-3xl">
+                  Thank you for applying.
+                </h1>
 
-              <p className="mt-4 leading-7 text-[var(--prospherum-muted)]">
-                Your application and supporting documents have been
-                successfully received by Prospherum Skills Academy.
-              </p>
+                <p className="mx-auto mt-4 max-w-lg text-sm leading-6 text-[var(--prospherum-muted)] sm:text-base sm:leading-7">
+                  Your application and supporting documents have been
+                  successfully received by Prospherum Skills Academy.
+                </p>
+              </div>
 
-              <div className="mt-8 rounded-xl bg-[var(--prospherum-grey)] p-6">
-                <p className="text-sm font-semibold text-[var(--prospherum-muted)]">
+              <div className="mt-8 rounded-2xl border border-emerald-500/10 bg-[#eef9f2] p-6 text-center">
+                <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--prospherum-muted)]">
                   Your application reference number
                 </p>
 
-                <p className="mt-2 text-2xl font-bold tracking-wider">
+                <p className="mt-3 text-2xl font-bold tracking-[0.14em] text-[var(--prospherum-text)]">
                   {success}
                 </p>
 
-                <p className="mt-3 text-xs text-[var(--prospherum-muted)]">
+                <p className="mt-3 text-xs leading-5 text-[var(--prospherum-muted)]">
                   Please keep this reference number for future enquiries.
                 </p>
               </div>
 
-              <Link
-                href="/"
-                className="mt-8 inline-flex items-center justify-center rounded-lg bg-[var(--prospherum-green)] px-6 py-3 text-sm font-bold text-white transition hover:opacity-90"
-              >
-                Return to Home
-              </Link>
+              <div className="mt-8 flex justify-center">
+                <Link
+                  href="/"
+                  className="inline-flex items-center justify-center rounded-full bg-[var(--prospherum-green)] px-7 py-3 text-sm font-bold text-white transition hover:bg-[var(--prospherum-green-dark)]"
+                >
+                  Return to Home
+                </Link>
+              </div>
             </div>
           </div>
         </section>
 
-        <footer className="border-t border-black/10 bg-white px-5 py-8 text-center text-xs text-[var(--prospherum-muted)]">
-          © 2026 Prospherum. All rights reserved.
+        <footer className="relative z-10 border-t border-black/[0.08] bg-white px-5 py-7 text-center text-xs text-[var(--prospherum-muted)]">
+          © {new Date().getFullYear()} Prospherum. All rights reserved.
         </footer>
       </main>
     );
   }
 
-  /*
-   * APPLICATION FORM
-   */
   return (
-    <main className="min-h-screen bg-[var(--prospherum-grey)] text-[var(--prospherum-text)]">
-      <header className="border-b border-black/10 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 sm:px-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="relative h-12 w-48">
-              <img
-                src="/branding/prospherum-logo.png"
-                alt="Prospherum Skills Academy"
-                className="h-full w-full object-contain object-left"
-              />
-            </div>
+    <main className="relative min-h-screen overflow-x-hidden bg-[#f4f7f5] text-[var(--prospherum-text)]">
+      <PageAtmosphere />
 
-            <div className="hidden sm:block">
-              <div className="text-lg font-bold tracking-tight">
-                Prospherum
-              </div>
-
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--prospherum-muted)]">
-                Skills Academy
-              </div>
-            </div>
+      {/* HEADER */}
+      <header className="relative z-30 border-b border-white/10 bg-[#07100c]/95 text-white backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-4">
+          <Link
+            href="/"
+            aria-label="Prospherum home"
+            className="relative flex h-9 w-36 shrink-0 items-center sm:h-11 sm:w-48"
+          >
+            <Image
+              src="/branding/prospherum_logo_trans3.png"
+              alt="Prospherum Skills Academy"
+              fill
+              priority
+              className="object-contain object-left"
+            />
           </Link>
 
           <Link
             href="/"
-            className="text-sm font-medium text-[var(--prospherum-muted)] transition-colors hover:text-[var(--prospherum-green)]"
+            className="text-xs font-medium text-white/55 transition hover:text-white sm:text-sm"
           >
             ← Back to Home
           </Link>
         </div>
       </header>
 
-      <section className="bg-[var(--prospherum-black)] text-white">
-        <div className="mx-auto max-w-4xl px-5 py-14 sm:px-8 sm:py-16">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green-light)]">
-            Prospherum Skills Academy
-          </p>
+      {/* HERO */}
+      <section className="relative min-h-[390px] overflow-hidden bg-[#07100c] text-white sm:min-h-[430px]">
+        {HERO_IMAGES.map((image, index) => (
+          <div
+            key={image}
+            className={`absolute inset-0 transition-opacity duration-[1800ms] ${
+              index === activeImage ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Image
+              src={image}
+              alt=""
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+        ))}
 
-          <h1 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
-            Start Your Application
-          </h1>
+        <div className="absolute inset-0 bg-black/65" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/25" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/15 to-black/30" />
 
-          <p className="mt-4 max-w-2xl text-base leading-7 text-white/70">
-            Complete the application form and provide the supporting
-            documents required for consideration.
-          </p>
+        <div className="absolute -right-40 top-1/4 h-96 w-96 rounded-full bg-emerald-400/10 blur-[120px]" />
+
+        <div className="relative z-10 mx-auto flex min-h-[390px] max-w-7xl items-end px-5 pb-10 sm:min-h-[430px] sm:px-8 sm:pb-14">
+          <div className="max-w-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <span className="h-px w-8 bg-emerald-400" />
+
+              <p className="text-[10px] font-bold uppercase tracking-[0.28em] text-[#b7e8cc] sm:text-[11px]">
+                Prospherum Skills Academy
+              </p>
+            </div>
+
+            <h1 className="text-3xl font-bold tracking-tight sm:text-4xl lg:text-[2.8rem]">
+              Start Your Application
+            </h1>
+
+            <p className="mt-3 max-w-xl text-sm leading-6 text-white/70 sm:text-base sm:leading-7">
+              Complete the application form and provide the supporting
+              documents required for consideration.
+            </p>
+
+            <div className="mt-7 flex items-center gap-1.5">
+              {HERO_IMAGES.map((image, index) => (
+                <span
+                  key={image}
+                  className={`h-1 rounded-full transition-all duration-500 ${
+                    index === activeImage
+                      ? "w-7 bg-emerald-400"
+                      : "w-1.5 bg-white/35"
+                  }`}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      <section className="px-5 py-10 sm:px-8 sm:py-14">
-        <div className="mx-auto max-w-4xl">
+      {/* FORM */}
+      <section className="relative z-10 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
+        <div className="mx-auto max-w-5xl">
           {errorMessage && (
             <div
               id="application-error"
               role="alert"
-              className="mb-8 border border-red-200 bg-red-50 p-5 text-sm text-red-800"
+              className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm leading-6 text-red-800 shadow-sm"
             >
               <p className="font-bold">
                 We could not submit your application.
@@ -379,200 +460,118 @@ export default function ApplyPage() {
 
           <form
             onSubmit={handleSubmit}
-            className="space-y-8"
+            className="space-y-5"
           >
             {/* SECTION 1 */}
-            <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
-              <div className="border-b border-black/10 pb-5">
-                <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
-                  Section 1
-                </p>
+            <section className="rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+              <SectionHeader
+                number="01"
+                eyebrow="Applicant Information"
+                title="Personal details"
+                description="Enter your information exactly as it appears on your official documents."
+              />
 
-                <h2 className="mt-2 text-2xl font-bold">
-                  Applicant Information
-                </h2>
+              <div className="grid gap-5 px-5 py-5 sm:grid-cols-2 sm:px-7 sm:py-7">
+                <FormField
+                  id="first_name"
+                  name="first_name"
+                  label="First name"
+                  required
+                  autoComplete="given-name"
+                />
 
-                <p className="mt-2 text-sm leading-6 text-[var(--prospherum-muted)]">
-                  Enter your personal information exactly as it appears on
-                  your official documents.
-                </p>
+                <FormField
+                  id="last_name"
+                  name="last_name"
+                  label="Last name"
+                  required
+                  autoComplete="family-name"
+                />
+
+                <FormField
+                  id="email"
+                  name="email"
+                  label="Email address"
+                  type="email"
+                  required
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                />
+
+                <FormField
+                  id="phone"
+                  name="phone"
+                  label="Phone number"
+                  type="tel"
+                  required
+                  autoComplete="tel"
+                  placeholder="e.g. 082 123 4567"
+                />
+
+                <FormField
+                  id="id_number"
+                  name="id_number"
+                  label="South African ID number"
+                  inputMode="numeric"
+                  maxLength={13}
+                  autoComplete="off"
+                  helper="If required for the opportunity, this will be verified against your supporting documentation."
+                />
+
+                <FormField
+                  id="date_of_birth"
+                  name="date_of_birth"
+                  label="Date of birth"
+                  type="date"
+                />
               </div>
-
-              <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="first_name"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    First name <span className="text-red-600">*</span>
-                  </label>
-
-                  <input
-                    id="first_name"
-                    name="first_name"
-                    type="text"
-                    required
-                    autoComplete="given-name"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="last_name"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Last name <span className="text-red-600">*</span>
-                  </label>
-
-                  <input
-                    id="last_name"
-                    name="last_name"
-                    type="text"
-                    required
-                    autoComplete="family-name"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Email address <span className="text-red-600">*</span>
-                  </label>
-
-                  <input
-                    id="email"
-                    name="email"
-                    type="email"
-                    required
-                    autoComplete="email"
-                    placeholder="you@example.com"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="phone"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Phone number <span className="text-red-600">*</span>
-                  </label>
-
-                  <input
-                    id="phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    autoComplete="tel"
-                    placeholder="e.g. 082 123 4567"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="id_number"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    South African ID number
-                  </label>
-
-                  <input
-                    id="id_number"
-                    name="id_number"
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={13}
-                    autoComplete="off"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-
-                  <p className="mt-2 text-xs text-[var(--prospherum-muted)]">
-                    If required for the opportunity, this will be verified
-                    against your supporting documentation.
-                  </p>
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="date_of_birth"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Date of birth
-                  </label>
-
-                  <input
-                    id="date_of_birth"
-                    name="date_of_birth"
-                    type="date"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-              </div>
-            </div>
+            </section>
 
             {/* SECTION 2 */}
-            <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
-              <div className="border-b border-black/10 pb-5">
-                <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
-                  Section 2
-                </p>
+            <section className="rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+              <SectionHeader
+                number="02"
+                eyebrow="Address Information"
+                title="Where you live"
+              />
 
-                <h2 className="mt-2 text-2xl font-bold">
-                  Address Information
-                </h2>
-              </div>
-
-              <div className="mt-6 grid gap-5 sm:grid-cols-2">
+              <div className="grid gap-5 px-5 py-5 sm:grid-cols-2 sm:px-7 sm:py-7">
                 <div className="sm:col-span-2">
-                  <label
-                    htmlFor="address"
-                    className="mb-2 block text-sm font-semibold"
-                  >
+                  <FormLabel htmlFor="address">
                     Address
-                  </label>
+                  </FormLabel>
 
                   <textarea
                     id="address"
                     name="address"
                     rows={3}
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                    className={`${textareaClass}`}
                   />
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="city"
-                    className="mb-2 block text-sm font-semibold"
-                  >
+                  <FormLabel htmlFor="city">
                     City / Town
-                  </label>
+                  </FormLabel>
 
                   <input
                     id="city"
                     name="city"
                     type="text"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                    className={inputClass}
                   />
                 </div>
 
                 <div>
-                  <label
-                    htmlFor="province"
-                    className="mb-2 block text-sm font-semibold"
-                  >
+                  <FormLabel htmlFor="province">
                     Province
-                  </label>
+                  </FormLabel>
 
                   <select
                     id="province"
                     name="province"
                     defaultValue=""
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                    className={inputClass}
                   >
                     <option value="">Select province</option>
                     <option>Eastern Cape</option>
@@ -587,145 +586,94 @@ export default function ApplyPage() {
                   </select>
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* SECTION 3 */}
-            <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
-              <div className="border-b border-black/10 pb-5">
-                <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
-                  Section 3
-                </p>
+            <section className="rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+              <SectionHeader
+                number="03"
+                eyebrow="Education and Programme"
+                title="Your education and opportunity"
+                description="Provide information about your educational background and the opportunity you are applying for."
+              />
 
-                <h2 className="mt-2 text-2xl font-bold">
-                  Education and Programme
-                </h2>
+              <div className="grid gap-5 px-5 py-5 sm:grid-cols-2 sm:px-7 sm:py-7">
+                <FormField
+                  id="highest_qualification"
+                  name="highest_qualification"
+                  label="Highest qualification"
+                />
 
-                <p className="mt-2 text-sm leading-6 text-[var(--prospherum-muted)]">
-                  Provide information about your educational background and
-                  the opportunity you are applying for.
-                </p>
-              </div>
+                <FormField
+                  id="field_of_study"
+                  name="field_of_study"
+                  label="Field of study"
+                />
 
-              <div className="mt-6 grid gap-5 sm:grid-cols-2">
-                <div>
-                  <label
-                    htmlFor="highest_qualification"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Highest qualification
-                  </label>
+                <FormField
+                  id="institution"
+                  name="institution"
+                  label="Institution"
+                />
 
-                  <input
-                    id="highest_qualification"
-                    name="highest_qualification"
-                    type="text"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="field_of_study"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Field of study
-                  </label>
-
-                  <input
-                    id="field_of_study"
-                    name="field_of_study"
-                    type="text"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="institution"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Institution
-                  </label>
-
-                  <input
-                    id="institution"
-                    name="institution"
-                    type="text"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor="programme_applied_for"
-                    className="mb-2 block text-sm font-semibold"
-                  >
-                    Programme applied for
-                  </label>
-
-                  <input
-                    id="programme_applied_for"
-                    name="programme_applied_for"
-                    type="text"
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
-                  />
-                </div>
+                <FormField
+                  id="programme_applied_for"
+                  name="programme_applied_for"
+                  label="Programme applied for"
+                />
 
                 <div className="sm:col-span-2">
-                  <label
-                    htmlFor="skills_computer_literacy"
-                    className="mb-2 block text-sm font-semibold"
-                  >
+                  <FormLabel htmlFor="skills_computer_literacy">
                     Skills and computer literacy
-                  </label>
+                  </FormLabel>
 
                   <textarea
                     id="skills_computer_literacy"
                     name="skills_computer_literacy"
                     rows={4}
                     placeholder="List relevant computer skills, software, systems or other abilities."
-                    className="w-full rounded-lg border border-black/15 bg-white px-4 py-3 outline-none transition focus:border-[var(--prospherum-green)] focus:ring-2 focus:ring-[var(--prospherum-green)]/10"
+                    className={textareaClass}
                   />
                 </div>
               </div>
-            </div>
+            </section>
 
             {/* SECTION 4 */}
-            <div className="bg-white p-6 shadow-sm ring-1 ring-black/5 sm:p-8">
-              <div className="border-b border-black/10 pb-5">
-                <p className="text-sm font-bold uppercase tracking-[0.15em] text-[var(--prospherum-green)]">
-                  Section 4
-                </p>
+            <section className="rounded-2xl border border-black/[0.06] bg-white shadow-sm">
+              <SectionHeader
+                number="04"
+                eyebrow="Supporting Documents"
+                title="Upload your documents"
+                description="Upload the documents required to support your application. Each file must be no larger than 10 MB."
+              />
 
-                <h2 className="mt-2 text-2xl font-bold">
-                  Supporting Documents
-                </h2>
-
-                <p className="mt-2 text-sm leading-6 text-[var(--prospherum-muted)]">
-                  Upload the documents required to support your application.
-                  Each file must be no larger than 10 MB.
-                </p>
-              </div>
-
-              <div className="mt-6 space-y-5">
+              <div className="space-y-4 px-5 py-5 sm:px-7 sm:py-7">
                 {DOCUMENT_FIELDS.map((field) => (
                   <div
                     key={field.name}
-                    className="rounded-xl border border-black/10 bg-[var(--prospherum-grey)] p-5"
+                    className="rounded-2xl border border-black/[0.07] bg-[#f7f9f7] p-4 transition hover:border-emerald-400/30 hover:bg-[#f4faf6] sm:p-5"
                   >
-                    <label
-                      htmlFor={field.name}
-                      className="block text-sm font-bold"
-                    >
-                      {field.label}{" "}
-                      {field.required && (
-                        <span className="text-red-600">*</span>
-                      )}
-                    </label>
+                    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                      <div className="min-w-0">
+                        <label
+                          htmlFor={field.name}
+                          className="text-sm font-bold"
+                        >
+                          {field.label}{" "}
+                          {field.required && (
+                            <span className="text-red-600">*</span>
+                          )}
+                        </label>
 
-                    <p className="mt-1 text-xs leading-5 text-[var(--prospherum-muted)]">
-                      {field.description}
-                    </p>
+                        <p className="mt-1 text-xs leading-5 text-[var(--prospherum-muted)]">
+                          {field.description}
+                        </p>
+                      </div>
+
+                      <span className="shrink-0 rounded-full bg-white px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-[var(--prospherum-muted)] ring-1 ring-black/[0.06]">
+                        {field.required ? "Required" : "Optional"}
+                      </span>
+                    </div>
 
                     <input
                       id={field.name}
@@ -733,25 +681,28 @@ export default function ApplyPage() {
                       type="file"
                       required={field.required}
                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                      className="mt-4 block w-full cursor-pointer rounded-lg border border-black/15 bg-white px-4 py-3 text-sm file:mr-4 file:rounded-md file:border-0 file:bg-[var(--prospherum-green)] file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:opacity-90"
+                      className="mt-4 block min-h-[50px] w-full cursor-pointer rounded-xl border border-[#b8c4bd] bg-[#eef2f0] p-2.5 text-sm text-[#17221c] outline-none transition hover:border-[#9eaba3] hover:bg-[#f3f6f4] focus:border-[#18a85b] focus:ring-4 focus:ring-[#18a85b]/10 file:mr-3 file:rounded-lg file:border-0 file:bg-[#18a85b] file:px-4 file:py-2 file:text-xs file:font-semibold file:text-white"
                     />
                   </div>
                 ))}
-              </div>
 
-              <div className="mt-6 rounded-lg border border-black/10 bg-white p-4">
-                <p className="text-xs leading-5 text-[var(--prospherum-muted)]">
-                  <strong>Accepted formats:</strong> PDF, JPG, PNG, DOC and
-                  DOCX. Maximum file size is 10 MB per document.
-                </p>
+                <div className="rounded-xl border border-emerald-500/10 bg-[#eef9f2] px-4 py-3">
+                  <p className="text-xs leading-5 text-[var(--prospherum-muted)]">
+                    <strong className="text-[var(--prospherum-text)]">
+                      Accepted formats:
+                    </strong>{" "}
+                    PDF, JPG, PNG, DOC and DOCX. Maximum file size is 10 MB
+                    per document.
+                  </p>
+                </div>
               </div>
-            </div>
+            </section>
 
-            {/* FORM ACTIONS */}
-            <div className="flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between">
+            {/* ACTIONS */}
+            <div className="flex flex-col-reverse gap-3 border-t border-black/[0.08] pt-5 sm:flex-row sm:items-center sm:justify-between">
               <Link
                 href="/"
-                className="text-center text-sm font-medium text-[var(--prospherum-muted)] transition-colors hover:text-[var(--prospherum-green)]"
+                className="inline-flex min-h-11 items-center justify-center rounded-full px-5 py-3 text-sm font-medium text-[var(--prospherum-muted)] transition hover:bg-white hover:text-[var(--prospherum-green)]"
               >
                 Cancel and return home
               </Link>
@@ -759,7 +710,7 @@ export default function ApplyPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="rounded-lg bg-[var(--prospherum-green)] px-7 py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                className="inline-flex min-h-11 items-center justify-center rounded-full bg-[var(--prospherum-green)] px-7 py-3 text-sm font-bold text-white shadow-lg shadow-emerald-900/10 transition hover:bg-[var(--prospherum-green-dark)] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {submitting
                   ? "Submitting Application..."
@@ -770,9 +721,115 @@ export default function ApplyPage() {
         </div>
       </section>
 
-      <footer className="border-t border-black/10 bg-white px-5 py-8 text-center text-xs text-[var(--prospherum-muted)]">
-        © 2026 Prospherum. All rights reserved.
+      <footer className="border-t border-black/[0.08] bg-white px-5 py-7 text-center text-xs text-[var(--prospherum-muted)]">
+        © {new Date().getFullYear()} Prospherum. All rights reserved.
       </footer>
     </main>
+  );
+}
+
+function SectionHeader({
+  number,
+  eyebrow,
+  title,
+  description,
+}: {
+  number: string;
+  eyebrow: string;
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="border-b border-black/[0.07] px-5 py-5 sm:px-7">
+      <div className="flex items-start gap-4">
+        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e8f7ed] text-xs font-black text-[var(--prospherum-green)]">
+          {number}
+        </span>
+
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.22em] text-[var(--prospherum-green)]">
+            {eyebrow}
+          </p>
+
+          <h2 className="mt-1 text-lg font-bold sm:text-xl">
+            {title}
+          </h2>
+
+          {description && (
+            <p className="mt-1 text-xs leading-5 text-[var(--prospherum-muted)] sm:text-sm">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function FormLabel({
+  htmlFor,
+  children,
+}: {
+  htmlFor: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <label
+      htmlFor={htmlFor}
+      className="block text-sm font-semibold text-[#17221c]"
+    >
+      {children}
+    </label>
+  );
+}
+
+function FormField({
+  id,
+  name,
+  label,
+  type = "text",
+  required = false,
+  autoComplete,
+  placeholder,
+  inputMode,
+  maxLength,
+  helper,
+}: {
+  id: string;
+  name: string;
+  label: string;
+  type?: string;
+  required?: boolean;
+  autoComplete?: string;
+  placeholder?: string;
+  inputMode?: React.HTMLAttributes<HTMLInputElement>["inputMode"];
+  maxLength?: number;
+  helper?: string;
+}) {
+  return (
+    <div className="min-w-0">
+      <FormLabel htmlFor={id}>
+        {label}{" "}
+        {required && <span className="text-red-600">*</span>}
+      </FormLabel>
+
+      <input
+        id={id}
+        name={name}
+        type={type}
+        required={required}
+        autoComplete={autoComplete}
+        placeholder={placeholder}
+        inputMode={inputMode}
+        maxLength={maxLength}
+        className={inputClass}
+      />
+
+      {helper && (
+        <p className="mt-2 text-[11px] leading-5 text-[#68756d]">
+          {helper}
+        </p>
+      )}
+    </div>
   );
 }
