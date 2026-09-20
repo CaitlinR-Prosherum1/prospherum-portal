@@ -1,8 +1,25 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import Image from "next/image";
+import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+
+const backgroundImages = [
+  "/branding/pic1.jpg",
+  "/branding/pic2.png",
+  "/branding/pic3.jpg",
+  "/branding/pic4.jpg",
+  "/branding/pic5.jpg",
+  "/branding/pic6.png",
+  "/branding/pic7.jpg",
+  "/branding/pic8.jpg",
+  "/branding/pic9.png",
+  "/branding/pic10.png",
+  "/branding/pic11.jpg",
+  "/branding/pic12.png",
+  "/branding/pic13.png",
+];
 
 export default function StaffLoginPage() {
   const router = useRouter();
@@ -14,6 +31,25 @@ export default function StaffLoginPage() {
   const [resetLoading, setResetLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [resetMessage, setResetMessage] = useState("");
+  const [activeImage, setActiveImage] = useState(0);
+
+  /* =========================================================
+     BACKGROUND SLIDESHOW
+     ========================================================= */
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveImage((current) => {
+        return (current + 1) % backgroundImages.length;
+      });
+    }, 5500);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  /* =========================================================
+     STAFF LOGIN
+     ========================================================= */
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -47,6 +83,7 @@ export default function StaffLoginPage() {
           result?.error ||
             "Your account does not have active Prospherum staff access.",
         );
+
         return;
       }
 
@@ -60,6 +97,10 @@ export default function StaffLoginPage() {
     }
   }
 
+  /* =========================================================
+     PASSWORD RESET
+     ========================================================= */
+
   async function handleForgotPassword() {
     setErrorMessage("");
     setResetMessage("");
@@ -68,25 +109,32 @@ export default function StaffLoginPage() {
       setErrorMessage(
         "Enter your staff email address first, then click Forgot password.",
       );
+
       return;
     }
 
     setResetLoading(true);
 
     try {
-      const redirectTo = `${window.location.origin}/staff/reset-password`;
+      const redirectTo =
+        `${window.location.origin}/staff/reset-password`;
 
-      const { error } = await supabase.auth.resetPasswordForEmail(
-        email.trim(),
-        {
-          redirectTo,
-        },
-      );
+      const { error } =
+        await supabase.auth.resetPasswordForEmail(
+          email.trim(),
+          {
+            redirectTo,
+          },
+        );
 
       if (error) {
         console.error("Password reset error:", error);
 
-        if (error.message.toLowerCase().includes("rate limit")) {
+        if (
+          error.message
+            .toLowerCase()
+            .includes("rate limit")
+        ) {
           setErrorMessage(
             "Password reset emails are temporarily rate-limited by Supabase. Please wait before requesting another email.",
           );
@@ -104,6 +152,7 @@ export default function StaffLoginPage() {
       );
     } catch (error) {
       console.error("Password reset error:", error);
+
       setErrorMessage(
         "Unable to send the password reset email. Please try again.",
       );
@@ -113,118 +162,263 @@ export default function StaffLoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-black text-white">
-      <div className="flex min-h-screen items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
-          <div className="mb-8 text-center">
-            <div className="mb-6 flex justify-center">
-              <img
-                src="/branding/prospherum-logo.png"
-                alt="Prospherum Skills Academy"
-                className="h-20 w-auto object-contain"
-              />
+    <main className="relative min-h-screen overflow-hidden bg-[#050806] text-white">
+
+      {/* =====================================================
+          BACKGROUND SLIDESHOW
+          ===================================================== */}
+
+      <div
+        aria-hidden="true"
+        className="absolute inset-0"
+      >
+        {backgroundImages.map((image, index) => (
+          <div
+            key={image}
+            className={`absolute inset-0 transition-opacity duration-[1800ms] ease-in-out ${
+              index === activeImage
+                ? "opacity-100"
+                : "opacity-0"
+            }`}
+          >
+            <Image
+              src={image}
+              alt=""
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+        ))}
+
+        {/* Dark cinematic overlay */}
+        <div className="absolute inset-0 bg-black/70" />
+
+        {/* Left-to-right dark gradient */}
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/60 to-black/45" />
+
+        {/* Bottom darkening */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/35" />
+
+        {/* Subtle Prospherum green atmosphere */}
+        <div className="absolute -right-40 top-1/4 h-[500px] w-[500px] rounded-full bg-emerald-500/10 blur-[150px]" />
+
+        <div className="absolute -left-40 bottom-[-180px] h-[450px] w-[450px] rounded-full bg-emerald-400/[0.07] blur-[140px]" />
+      </div>
+
+      {/* =====================================================
+          CONTENT
+          ===================================================== */}
+
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8 sm:px-6">
+
+        <div className="w-full max-w-[430px]">
+
+          {/* =================================================
+              LOGO / BRANDING
+              ================================================= */}
+
+          <div className="mb-7 text-center sm:mb-8">
+
+            <div className="mb-5 flex justify-center">
+
+              <div className="relative h-14 w-[210px] sm:h-16 sm:w-[230px]">
+
+                <Image
+                  src="/branding/prospherum_logo_trans3.png"
+                  alt="Prospherum Skills Academy"
+                  fill
+                  priority
+                  className="object-contain"
+                />
+
+              </div>
+
             </div>
 
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-green-400">
+            <p className="text-[10px] font-semibold uppercase tracking-[0.32em] text-[#b7e8cc] sm:text-[11px]">
               Prospherum Skills Academy
             </p>
 
-            <h1 className="mt-3 text-3xl font-bold">
+            <h1 className="mt-2.5 text-2xl font-semibold tracking-tight sm:text-[28px]">
               Staff Portal
             </h1>
 
-            <p className="mt-3 text-sm text-gray-400">
-              Sign in to manage learner applications.
+            <p className="mx-auto mt-2 max-w-sm text-sm leading-6 text-white/60">
+              Secure access to learner applications and administration.
             </p>
+
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6 shadow-2xl">
-            {errorMessage && (
-              <div className="mb-5 rounded-lg border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
-                {errorMessage}
-              </div>
-            )}
+          {/* =================================================
+              LOGIN CARD
+              ================================================= */}
 
-            {resetMessage && (
-              <div className="mb-5 rounded-lg border border-green-500/30 bg-green-500/10 px-4 py-3 text-sm text-green-300">
-                {resetMessage}
-              </div>
-            )}
+          <div className="relative overflow-hidden rounded-2xl border border-white/15 bg-black/45 shadow-[0_30px_100px_rgba(0,0,0,0.55)] backdrop-blur-xl">
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label
-                  htmlFor="email"
-                  className="mb-2 block text-sm font-medium text-gray-200"
-                >
-                  Staff email
-                </label>
+            {/* Green top line */}
 
-                <input
-                  id="email"
-                  type="email"
-                  value={email}
-                  onChange={(event) => {
-                    setEmail(event.target.value);
-                    setErrorMessage("");
-                    setResetMessage("");
-                  }}
-                  required
-                  autoComplete="email"
-                  placeholder="name@prospherum.co.za"
-                  className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white outline-none transition focus:border-green-500"
-                />
-              </div>
+            <div className="absolute left-0 right-0 top-0 h-px bg-gradient-to-r from-transparent via-emerald-400 to-transparent" />
 
-              <div>
-                <div className="mb-2 flex items-center justify-between">
+            <div className="p-5 sm:p-7">
+
+              {/* Error */}
+
+              {errorMessage && (
+                <div className="mb-5 rounded-xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm leading-5 text-red-300">
+                  {errorMessage}
+                </div>
+              )}
+
+              {/* Reset message */}
+
+              {resetMessage && (
+                <div className="mb-5 rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-3 text-sm leading-5 text-emerald-300">
+                  {resetMessage}
+                </div>
+              )}
+
+              <form
+                onSubmit={handleSubmit}
+                className="space-y-5"
+              >
+
+                {/* Email */}
+
+                <div>
+
                   <label
-                    htmlFor="password"
-                    className="block text-sm font-medium text-gray-200"
+                    htmlFor="email"
+                    className="mb-2 block text-xs font-semibold uppercase tracking-wide text-white/70"
                   >
-                    Password
+                    Staff email
                   </label>
 
-                  <button
-                    type="button"
-                    onClick={handleForgotPassword}
-                    disabled={resetLoading}
-                    className="text-xs font-medium text-green-400 transition hover:text-green-300 disabled:cursor-not-allowed disabled:opacity-50"
-                  >
-                    {resetLoading ? "Sending..." : "Forgot password?"}
-                  </button>
+                  <input
+                    id="email"
+                    type="email"
+                    value={email}
+                    onChange={(event) => {
+                      setEmail(event.target.value);
+                      setErrorMessage("");
+                      setResetMessage("");
+                    }}
+                    required
+                    autoComplete="email"
+                    placeholder="name@prospherum.co.za"
+                    className="min-h-12 w-full rounded-xl border border-white/15 bg-black/45 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-all focus:border-emerald-400/70 focus:bg-black/55 focus:ring-2 focus:ring-emerald-400/10"
+                  />
+
                 </div>
 
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(event) => {
-                    setPassword(event.target.value);
-                    setErrorMessage("");
-                  }}
-                  required
-                  autoComplete="current-password"
-                  placeholder="Enter your password"
-                  className="w-full rounded-lg border border-white/10 bg-black px-4 py-3 text-white outline-none transition focus:border-green-500"
-                />
-              </div>
+                {/* Password */}
 
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-lg bg-green-600 px-4 py-3 font-semibold text-white transition hover:bg-green-500 disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                {loading ? "Signing in..." : "Sign in"}
-              </button>
-            </form>
+                <div>
+
+                  <div className="mb-2 flex items-center justify-between gap-3">
+
+                    <label
+                      htmlFor="password"
+                      className="block text-xs font-semibold uppercase tracking-wide text-white/70"
+                    >
+                      Password
+                    </label>
+
+                    <button
+                      type="button"
+                      onClick={handleForgotPassword}
+                      disabled={resetLoading}
+                      className="text-xs font-medium text-emerald-400 transition-colors hover:text-emerald-300 disabled:cursor-not-allowed disabled:opacity-50"
+                    >
+                      {resetLoading
+                        ? "Sending..."
+                        : "Forgot password?"}
+                    </button>
+
+                  </div>
+
+                  <input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(event) => {
+                      setPassword(event.target.value);
+                      setErrorMessage("");
+                    }}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Enter your password"
+                    className="min-h-12 w-full rounded-xl border border-white/15 bg-black/45 px-4 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-all focus:border-emerald-400/70 focus:bg-black/55 focus:ring-2 focus:ring-emerald-400/10"
+                  />
+
+                </div>
+
+                {/* Sign in */}
+
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="min-h-12 w-full rounded-xl bg-emerald-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-950/30 transition-all hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {loading
+                    ? "Signing in..."
+                    : "Sign in"}
+                </button>
+
+              </form>
+
+            </div>
+
           </div>
 
-          <p className="mt-6 text-center text-xs text-gray-500">
-            Authorised Prospherum staff only.
-          </p>
+          {/* =================================================
+              FOOTER
+              ================================================= */}
+
+          <div className="mt-5 text-center">
+
+            <p className="text-[11px] text-white/40">
+              Authorised Prospherum staff only.
+            </p>
+
+            <div className="mt-3 flex items-center justify-center gap-2">
+
+              <span className="h-1 w-1 rounded-full bg-emerald-400/70" />
+
+              <span className="text-[10px] uppercase tracking-[0.18em] text-white/25">
+                Secure staff access
+              </span>
+
+              <span className="h-1 w-1 rounded-full bg-emerald-400/70" />
+
+            </div>
+
+          </div>
+
+          {/* =================================================
+              SLIDESHOW INDICATORS
+              ================================================= */}
+
+          <div className="mt-5 flex justify-center gap-1.5">
+
+            {backgroundImages.map((image, index) => (
+              <span
+                key={image}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  index === activeImage
+                    ? "w-6 bg-emerald-400"
+                    : "w-1 bg-white/30"
+                }`}
+              />
+            ))}
+
+          </div>
+
         </div>
+
       </div>
+
     </main>
   );
 }

@@ -288,3 +288,127 @@ html[data-staff-theme="light"] .shadow-xl {
 html[data-staff-theme="light"] .bg-black\/95 {
   background-color: rgb(255 255 255 / 95%) !important;
 }
+
+
+/* Prospherum atmospheric mist */
+@keyframes prospherum-mist-drift {
+  0% {
+    transform: translate3d(-4%, 0, 0) scale(1.05);
+  }
+
+  50% {
+    transform: translate3d(3%, -3%, 0) scale(1.1);
+  }
+
+  100% {
+    transform: translate3d(-4%, 0, 0) scale(1.05);
+  }
+}
+
+.prospherum-mist {
+  animation: prospherum-mist-drift 14s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prospherum-mist {
+    animation: none;
+  }
+}
+
+/* =========================================================
+   PROSPHERUM GREEN ATMOSPHERIC MIST
+   ========================================================= */
+
+.prospherum-green-mist {
+  isolation: isolate;
+}
+
+.prospherum-mist-cloud {
+  position: absolute;
+  pointer-events: none;
+  width: 65%;
+  height: 180px;
+  border-radius: 9999px;
+  filter: blur(55px);
+  opacity: 0.13;
+  will-change: transform;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(77, 185, 125, 0.55) 0%,
+      rgba(113, 204, 151, 0.30) 38%,
+      rgba(176, 229, 199, 0.10) 62%,
+      transparent 78%
+    );
+}
+
+.prospherum-mist-cloud-one {
+  top: 12%;
+  right: -70%;
+  animation: prospherum-mist-flow-one 24s linear infinite;
+}
+
+.prospherum-mist-cloud-two {
+  top: 47%;
+  right: -75%;
+  width: 75%;
+  height: 150px;
+  opacity: 0.10;
+  animation: prospherum-mist-flow-two 31s linear infinite;
+  animation-delay: -9s;
+}
+
+.prospherum-mist-cloud-three {
+  top: 72%;
+  right: -65%;
+  width: 55%;
+  height: 130px;
+  opacity: 0.08;
+  animation: prospherum-mist-flow-three 27s linear infinite;
+  animation-delay: -15s;
+}
+
+@keyframes prospherum-mist-flow-one {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  100% {
+    transform: translate3d(-260%, 8px, 0) scale(1.08);
+  }
+}
+
+@keyframes prospherum-mist-flow-two {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1.05);
+  }
+
+  100% {
+    transform: translate3d(-250%, -12px, 0) scale(1.12);
+  }
+}
+
+@keyframes prospherum-mist-flow-three {
+  0% {
+    transform: translate3d(0, 0, 0) scale(0.95);
+  }
+
+  100% {
+    transform: translate3d(-270%, 10px, 0) scale(1.1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prospherum-mist-cloud {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .prospherum-mist-cloud {
+    width: 110%;
+    height: 130px;
+    filter: blur(45px);
+    opacity: 0.10;
+  }
+}

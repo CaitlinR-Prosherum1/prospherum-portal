@@ -1,5 +1,24 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect, useState } from "react";
+
+const heroImages = [
+  "/branding/pic1.jpg",
+  "/branding/pic2.png",
+  "/branding/pic3.jpg",
+  "/branding/pic4.jpg",
+  "/branding/pic5.jpg",
+  "/branding/pic6.png",
+  "/branding/pic7.jpg",
+  "/branding/pic8.jpg",
+  "/branding/pic9.png",
+  "/branding/pic10.png",
+  "/branding/pic11.jpg",
+  "/branding/pic12.png",
+  "/branding/pic13.png",
+];
 
 const steps = [
   {
@@ -28,264 +47,445 @@ const steps = [
   },
 ];
 
-export default function Home() {
+function GreenMist() {
   return (
-    <main className="min-h-screen bg-white text-[var(--prospherum-text)]">
-      {/* Header */}
-      <header className="border-b border-black/10 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-8 sm:py-4">
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+    >
+      <div className="prospherum-mist prospherum-mist-1" />
+      <div className="prospherum-mist prospherum-mist-2" />
+      <div className="prospherum-mist prospherum-mist-3" />
+    </div>
+  );
+}
+
+export default function Home() {
+  const [activeImage, setActiveImage] = useState(0);
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setActiveImage((current) => (current + 1) % heroImages.length);
+    }, 5500);
+
+    return () => window.clearInterval(interval);
+  }, []);
+
+  return (
+    <main className="min-h-screen overflow-x-hidden bg-white text-[var(--prospherum-text)]">
+
+      {/* =====================================================
+          HEADER
+          ===================================================== */}
+
+      <header className="absolute left-0 top-0 z-50 w-full border-b border-white/10 bg-black/20 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-8 sm:py-4">
+
           {/* Logo */}
+
           <Link
             href="/"
-            className="flex min-w-0 shrink items-center gap-3"
+            className="relative flex h-9 w-36 shrink-0 items-center sm:h-11 sm:w-48"
             aria-label="Prospherum home"
           >
-            <div className="relative h-10 w-36 shrink-0 sm:h-12 sm:w-48">
-              <Image
-                src="/branding/prospherum-logo.png"
-                alt="Prospherum Skills Academy"
-                fill
-                priority
-                className="object-contain object-left"
-              />
-            </div>
-
-            {/* Desktop brand text */}
-            <div className="hidden sm:block">
-              <div className="text-lg font-bold tracking-tight">
-                Prospherum
-              </div>
-
-              <div className="text-xs font-medium uppercase tracking-[0.18em] text-[var(--prospherum-muted)]">
-                Skills Academy
-              </div>
-            </div>
+            <Image
+              src="/branding/prospherum_logo_trans3.png"
+              alt="Prospherum Skills Academy"
+              fill
+              priority
+              className="object-contain object-left"
+            />
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden items-center gap-8 text-sm font-medium md:flex">
+
+          <nav className="hidden items-center gap-7 text-sm font-medium text-white md:flex">
+
             <Link
               href="#about"
-              className="transition-colors hover:text-[var(--prospherum-green)]"
+              className="transition-colors hover:text-[#b7e8cc]"
             >
               About
             </Link>
 
             <Link
               href="#how-it-works"
-              className="transition-colors hover:text-[var(--prospherum-green)]"
+              className="transition-colors hover:text-[#b7e8cc]"
             >
               How It Works
             </Link>
 
             <Link
               href="#contact"
-              className="transition-colors hover:text-[var(--prospherum-green)]"
+              className="transition-colors hover:text-[#b7e8cc]"
             >
               Contact
             </Link>
 
             <Link
               href="/staff/login"
-              className="border border-[var(--prospherum-black)] px-5 py-2.5 transition-colors hover:bg-[var(--prospherum-black)] hover:text-white"
+              className="rounded-full border border-white/30 px-5 py-2 transition-all hover:border-white hover:bg-white hover:text-black"
             >
               Staff Login
-            </Link>
-          </nav>
-
-          {/* Mobile Navigation */}
-          <div className="flex shrink-0 items-center gap-1.5 md:hidden">
-            <Link
-              href="/staff/login"
-              className="whitespace-nowrap border border-black/15 px-2.5 py-2 text-[11px] font-semibold text-[var(--prospherum-black)] transition-colors hover:border-[var(--prospherum-green)] hover:bg-[var(--prospherum-green-light)] hover:text-[var(--prospherum-green)]"
-            >
-              Staff Sign In
             </Link>
 
             <Link
               href="/apply"
-              className="whitespace-nowrap bg-[var(--prospherum-green)] px-3 py-2 text-[11px] font-semibold text-white transition-colors hover:bg-[var(--prospherum-green-dark)]"
+              className="rounded-full bg-[var(--prospherum-green)] px-5 py-2 text-white transition-all hover:bg-[var(--prospherum-green-dark)]"
+            >
+              Apply Now
+            </Link>
+
+          </nav>
+
+          {/* Mobile Navigation */}
+
+          <div className="flex shrink-0 items-center gap-2 md:hidden">
+
+            <Link
+              href="/staff/login"
+              className="rounded-full border border-white/30 px-3 py-2 text-[11px] font-semibold text-white"
+            >
+              Staff
+            </Link>
+
+            <Link
+              href="/apply"
+              className="rounded-full bg-[var(--prospherum-green)] px-3.5 py-2 text-[11px] font-bold text-white"
             >
               Apply
             </Link>
+
           </div>
+
         </div>
       </header>
 
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-[var(--prospherum-black)] text-white">
-        <div className="absolute right-0 top-0 h-full w-1/3 bg-[var(--prospherum-green)] opacity-90 [clip-path:polygon(35%_0,100%_0,100%_100%,0_100%)]" />
+      {/* =====================================================
+          HERO
+          ===================================================== */}
 
-        <div className="relative mx-auto max-w-7xl px-5 py-20 sm:px-8 sm:py-28 lg:py-32">
-          <div className="max-w-3xl">
-            <p className="mb-5 text-sm font-bold uppercase tracking-[0.25em] text-[var(--prospherum-green-light)]">
-              Prospherum Skills Academy
-            </p>
+      <section className="relative flex min-h-[680px] items-center overflow-hidden bg-[#07100c] text-white sm:min-h-[720px]">
 
-            <h1 className="max-w-3xl text-4xl font-bold leading-tight tracking-tight sm:text-5xl lg:text-6xl">
-              Skills, opportunity and a pathway to your future.
+        {/* Slideshow */}
+
+        {heroImages.map((image, index) => (
+          <div
+            key={image}
+            className={`absolute inset-0 transition-opacity duration-[1800ms] ${
+              index === activeImage ? "opacity-100" : "opacity-0"
+            }`}
+          >
+            <Image
+              src={image}
+              alt=""
+              fill
+              priority={index === 0}
+              sizes="100vw"
+              className="object-cover"
+            />
+          </div>
+        ))}
+
+        {/* Cinematic overlay */}
+
+        <div className="absolute inset-0 bg-black/55" />
+
+        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/20" />
+
+        <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-black/20" />
+
+        {/* Green atmospheric glow */}
+
+        <div className="absolute -right-32 top-1/3 h-72 w-72 rounded-full bg-[var(--prospherum-green)]/20 blur-[110px]" />
+
+        {/* Hero content */}
+
+        <div className="relative z-10 mx-auto w-full max-w-7xl px-5 pb-20 pt-32 sm:px-8 sm:pb-24 sm:pt-36">
+
+          <div className="max-w-2xl">
+
+            <div className="mb-5 flex items-center gap-3">
+
+              <span className="h-px w-8 bg-[var(--prospherum-green)]" />
+
+              <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-[#b7e8cc] sm:text-xs">
+                Prospherum Skills Academy
+              </p>
+
+            </div>
+
+            <h1 className="max-w-2xl text-4xl font-bold leading-[1.08] tracking-[-0.025em] sm:text-5xl lg:text-[3.5rem]">
+              Skills. Opportunity.
+
+              <span className="block text-[#b7e8cc]">
+                Your Future.
+              </span>
             </h1>
 
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-white/75 sm:text-xl">
-              Discover funded training opportunities and take the next step
-              towards qualifications, workplace experience and meaningful
-              opportunities.
+            <p className="mt-5 max-w-xl text-sm leading-6 text-white/75 sm:text-base sm:leading-7">
+              Discover funded training opportunities and take the next
+              step towards qualifications, workplace experience and
+              meaningful opportunities.
             </p>
 
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+
               <Link
                 href="/apply"
-                className="inline-flex items-center justify-center bg-[var(--prospherum-green)] px-7 py-4 font-bold text-white transition-colors hover:bg-[var(--prospherum-green-dark)]"
+                className="inline-flex items-center justify-center rounded-full bg-[var(--prospherum-green)] px-6 py-3 text-sm font-bold text-white shadow-lg shadow-black/20 transition-all hover:-translate-y-0.5 hover:bg-[var(--prospherum-green-dark)]"
               >
-                Apply for an Opportunity
+                Apply Now
               </Link>
 
               <Link
                 href="#how-it-works"
-                className="inline-flex items-center justify-center border border-white/30 px-7 py-4 font-semibold text-white transition-colors hover:bg-white hover:text-[var(--prospherum-black)]"
+                className="inline-flex items-center justify-center rounded-full border border-white/30 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition-all hover:bg-white hover:text-black"
               >
                 How It Works
               </Link>
+
             </div>
+
           </div>
+
+          {/* Slideshow indicators */}
+
+          <div className="mt-12 flex items-center gap-1.5">
+
+            {heroImages.map((image, index) => (
+              <span
+                key={image}
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  index === activeImage
+                    ? "w-7 bg-[var(--prospherum-green)]"
+                    : "w-1.5 bg-white/35"
+                }`}
+              />
+            ))}
+
+          </div>
+
         </div>
+
       </section>
 
-      {/* About */}
-      <section id="about" className="bg-white">
-        <div className="mx-auto grid max-w-7xl gap-12 px-5 py-20 sm:px-8 lg:grid-cols-2 lg:items-center lg:py-24">
+      {/* =====================================================
+          ABOUT
+          ===================================================== */}
+
+      <section
+        id="about"
+        className="relative overflow-hidden bg-white"
+      >
+
+        <GreenMist />
+
+        <div className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 py-14 sm:px-8 sm:py-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-16 lg:py-20">
+
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green)]">
+
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--prospherum-green)]">
               About Prospherum
             </p>
 
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-2.5 text-2xl font-bold tracking-tight sm:text-3xl">
               More than a qualification.
             </h2>
 
-            <div className="mt-6 space-y-5 text-base leading-7 text-[var(--prospherum-muted)]">
+            <div className="mt-4 max-w-xl space-y-3 text-sm leading-6 text-[var(--prospherum-muted)]">
+
               <p>
-                Prospherum is a South African non-profit organisation focused
-                on supporting people through funded training opportunities and
-                learner development.
+                Prospherum is a South African non-profit organisation
+                focused on supporting people through funded training
+                opportunities and learner development.
               </p>
 
               <p>
-                The organisation works to identify learning opportunities,
-                improve learner selection and provide support that helps
-                learners succeed during and after their training.
+                The organisation works to identify learning
+                opportunities, improve learner selection and provide
+                support that helps learners succeed during and after
+                their training.
               </p>
 
               <p>
-                Our goal is to help people develop skills that can contribute
-                to themselves, their families, their communities and the
-                country.
+                Our goal is to help people develop skills that can
+                contribute to themselves, their families, their
+                communities and the country.
               </p>
+
             </div>
+
           </div>
 
-          <div className="bg-[var(--prospherum-green-light)] p-8 sm:p-10">
-            <div className="border-l-4 border-[var(--prospherum-green)] pl-6">
-              <p className="text-xl font-semibold leading-8 text-[var(--prospherum-text)]">
+          {/* Highlight */}
+
+          <div className="relative overflow-hidden rounded-2xl bg-[#edf9f2] p-7 sm:p-9">
+
+            <div className="absolute -right-16 -top-16 h-36 w-36 rounded-full bg-[var(--prospherum-green)]/15 blur-3xl" />
+
+            <div className="relative border-l-2 border-[var(--prospherum-green)] pl-5">
+
+              <p className="text-lg font-semibold leading-7 text-[var(--prospherum-text)] sm:text-xl">
                 “Your success is our success.”
               </p>
 
-              <p className="mt-4 text-sm leading-6 text-[var(--prospherum-muted)]">
-                Prospherum supports learners with more than training alone,
-                including selection, learner support and tools that can help
-                prepare them for the world of work.
+              <p className="mt-3 text-sm leading-6 text-[var(--prospherum-muted)]">
+                Prospherum supports learners with more than training
+                alone, including selection, learner support and tools
+                that can help prepare them for the world of work.
               </p>
+
             </div>
+
           </div>
+
         </div>
+
       </section>
 
-      {/* How it works */}
-      <section id="how-it-works" className="bg-[var(--prospherum-grey)]">
-        <div className="mx-auto max-w-7xl px-5 py-20 sm:px-8 lg:py-24">
-          <div className="max-w-2xl">
-            <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green)]">
+      {/* =====================================================
+          HOW IT WORKS
+          ===================================================== */}
+
+      <section
+        id="how-it-works"
+        className="relative overflow-hidden bg-[#f4f7f5]"
+      >
+
+        <GreenMist />
+
+        <div className="relative z-10 mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-16 lg:py-20">
+
+          <div className="max-w-xl">
+
+            <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[var(--prospherum-green)]">
               Simple application process
             </p>
 
-            <h2 className="mt-3 text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="mt-2.5 text-2xl font-bold tracking-tight sm:text-3xl">
               Start your application in a few simple steps.
             </h2>
+
           </div>
 
-          <div className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+          {/* Steps */}
+
+          <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+
             {steps.map((step) => (
               <div
                 key={step.number}
-                className="bg-white p-7 shadow-sm ring-1 ring-black/5"
+                className="group rounded-2xl border border-black/5 bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
               >
-                <div className="text-sm font-black text-[var(--prospherum-green)]">
-                  {step.number}
+
+                <div className="flex items-center justify-between">
+
+                  <span className="text-xs font-black tracking-wider text-[var(--prospherum-green)]">
+                    {step.number}
+                  </span>
+
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--prospherum-green)]/50 transition-all group-hover:w-5" />
+
                 </div>
 
-                <h3 className="mt-5 text-lg font-bold">{step.title}</h3>
+                <h3 className="mt-5 text-base font-bold">
+                  {step.title}
+                </h3>
 
-                <p className="mt-3 text-sm leading-6 text-[var(--prospherum-muted)]">
+                <p className="mt-2 text-xs leading-5 text-[var(--prospherum-muted)]">
                   {step.description}
                 </p>
+
               </div>
             ))}
+
           </div>
 
-          <div className="mt-10">
+          <div className="mt-7">
+
             <Link
               href="/apply"
-              className="inline-flex bg-[var(--prospherum-green)] px-7 py-4 font-bold text-white transition-colors hover:bg-[var(--prospherum-green-dark)]"
+              className="inline-flex rounded-full bg-[var(--prospherum-green)] px-6 py-3 text-sm font-bold text-white transition-all hover:bg-[var(--prospherum-green-dark)]"
             >
               Start Your Application
             </Link>
+
           </div>
+
         </div>
+
       </section>
 
-      {/* Contact / CTA */}
-      <section id="contact" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-20 text-center sm:px-8 lg:py-24">
-          <p className="text-sm font-bold uppercase tracking-[0.2em] text-[var(--prospherum-green)]">
+      {/* =====================================================
+          CONTACT / CTA
+          ===================================================== */}
+
+      <section
+        id="contact"
+        className="relative overflow-hidden bg-[#09120e] text-white"
+      >
+
+        <div className="absolute -left-24 top-1/2 h-64 w-64 -translate-y-1/2 rounded-full bg-[var(--prospherum-green)]/10 blur-[100px]" />
+
+        <div className="relative mx-auto max-w-7xl px-5 py-14 text-center sm:px-8 sm:py-16 lg:py-20">
+
+          <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-[#b7e8cc]">
             Ready to take the next step?
           </p>
 
-          <h2 className="mx-auto mt-3 max-w-2xl text-3xl font-bold tracking-tight sm:text-4xl">
+          <h2 className="mx-auto mt-2.5 max-w-xl text-2xl font-bold tracking-tight sm:text-3xl">
             Your next opportunity could start here.
           </h2>
 
-          <p className="mx-auto mt-5 max-w-2xl leading-7 text-[var(--prospherum-muted)]">
-            Apply when a suitable Prospherum opportunity is available and
-            submit your information securely for consideration.
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-white/65">
+            Apply when a suitable Prospherum opportunity is available
+            and submit your information securely for consideration.
           </p>
 
-          <div className="mt-8">
+          <div className="mt-6">
+
             <Link
               href="/apply"
-              className="inline-flex bg-[var(--prospherum-black)] px-8 py-4 font-bold text-white transition-colors hover:bg-[var(--prospherum-green)]"
+              className="inline-flex rounded-full bg-[var(--prospherum-green)] px-7 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[var(--prospherum-green-dark)]"
             >
               Apply Now
             </Link>
+
           </div>
+
         </div>
+
       </section>
 
-      {/* Footer */}
-      <footer className="bg-[var(--prospherum-black)] text-white">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-5 py-10 sm:px-8 md:flex-row md:items-center md:justify-between">
-          <div>
-            <div className="font-bold">Prospherum</div>
+      {/* =====================================================
+          FOOTER
+          ===================================================== */}
 
-            <div className="mt-1 text-sm text-white/60">
+      <footer className="bg-[#050806] text-white">
+
+        <div className="mx-auto flex max-w-7xl flex-col gap-3 px-5 py-7 sm:px-8 md:flex-row md:items-center md:justify-between">
+
+          <div>
+
+            <div className="font-semibold">
+              Prospherum
+            </div>
+
+            <div className="mt-0.5 text-xs text-white/45">
               Skills Development Fund
             </div>
+
           </div>
 
-          <div className="text-sm text-white/60">
+          <div className="text-xs text-white/40">
             © {new Date().getFullYear()} Prospherum. All rights reserved.
           </div>
+
         </div>
+
       </footer>
+
     </main>
   );
 }
